@@ -15,7 +15,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Database Models
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -44,9 +44,9 @@ def load_user(user_id):
 # Routes
 @app.route('/')
 def index():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return redirect(url_for('dashboard'))
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -81,7 +81,7 @@ def login():
         
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
+            login_user(user)
             return redirect(url_for('dashboard'))
         
         flash('Invalid username or password')
@@ -89,15 +89,13 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    logout_user()
     return redirect(url_for('login'))
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
+    user = current_user
     expenses = Expense.query.filter_by(user_id=user.id).order_by(Expense.date.desc()).all()
     total_expense = sum(expense.amount for expense in expenses)
     
@@ -107,10 +105,8 @@ def dashboard():
                          monthly_income=user.monthly_income)
 
 @app.route('/add_expense', methods=['POST'])
+@login_required
 def add_expense():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
     amount = float(request.form['amount'])
     category = request.form['category']
     description = request.form['description']
@@ -121,7 +117,7 @@ def add_expense():
         category=category,
         description=description,
         date=date,
-        user_id=session['user_id']
+        user_id=current_user.id
     )
     
     db.session.add(new_expense)
@@ -131,12 +127,10 @@ def add_expense():
     return redirect(url_for('dashboard'))
 
 @app.route('/delete_expense/<int:id>')
+@login_required
 def delete_expense(id):
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
     expense = Expense.query.get_or_404(id)
-    if expense.user_id != session['user_id']:
+    if expense.user_id != current_user.id:
         flash('Unauthorized action')
         return redirect(url_for('dashboard'))
     
@@ -147,11 +141,9 @@ def delete_expense(id):
     return redirect(url_for('dashboard'))
 
 @app.route('/update_income', methods=['POST'])
+@login_required
 def update_income():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
+    user = current_user
     user.monthly_income = float(request.form['monthly_income'])
     db.session.commit()
     
@@ -159,11 +151,9 @@ def update_income():
     return redirect(url_for('dashboard'))
 
 @app.route('/get_expense_data')
+@login_required
 def get_expense_data():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    expenses = Expense.query.filter_by(user_id=session['user_id']).all()
+    expenses = Expense.query.filter_by(user_id=current_user.id).all()
     
     # Calculate expenses by category
     categories = {}

@@ -1,85 +1,71 @@
 # Personal Expense Tracker
 
-A modern and interactive web-based personal expense tracker application built with Flask, designed to help you manage your finances effectively with a user-friendly interface and insightful data visualizations.
+A modern web application for tracking personal expenses with beautiful visualizations and user-friendly features.
 
 ## Features
 
-### 🔐 User Authentication
-- **Registration**: Allows new users to create accounts securely.
-- **Login**: Existing users can log in to access their personalized dashboard.
-- **Secure Password Hashing**: Passwords are securely stored using `werkzeug.security`.
-- **Session Management**: Maintains user sessions for a seamless experience.
+- User authentication and secure login
+- Expense tracking with categories
+- Monthly income tracking
+- Interactive charts and analytics
+- Dark mode support
+- Responsive design
+- Monthly comparison views
 
-### 🖥️ Modern User Interface (UI)
-- **Responsive Design**: Built with Bootstrap 5 for a clean, modern, and mobile-friendly layout.
-- **Dark Mode**: Toggle between light and dark themes for improved readability and user preference.
-- **Interactive Charts**: Utilizes Chart.js for dynamic and visually appealing data visualizations.
-- **Font Awesome Icons**: Enhances the UI with a wide range of recognizable icons.
-- **Animated Elements**: Smooth fade-in, slide animations, and hover effects for a dynamic user experience.
-- **Comprehensive Layout**: Includes a header, footer with social media links, and a card-based design for clear content organization.
+## Deployment Instructions
 
-### 📊 Dashboard Functionality
-- **Add Expenses**: Easily record new expenses with fields for amount, category, description, and date.
-- **View Total Expenses**: Displays a real-time sum of all recorded expenses.
-- **Monthly Income Tracking**: Input and update your monthly income to compare against your spending.
-- **Expense Suggestions**: Provides smart, data-driven suggestions based on spending patterns, monthly trends, and income-to-expense ratio to help manage finances.
-- **Recent Expenses Table**: A well-formatted table listing recent expenses with options to delete individual entries.
+### Deploying to Render.com
 
-### 📈 Data Visualization
-- **Expenses by Category (Pie Chart)**: Visualizes the distribution of your spending across different categories.
-- **Monthly Comparison (Bar Chart)**: Compares your expenses month-to-month, helping to identify spending trends.
-- **Income vs Expenses (Line Chart)**: Tracks your monthly income against your expenses over time, providing insights into your financial health.
+1. Create a Render account at https://render.com
 
-## Tech Stack
+2. Create a new Web Service:
+   - Click "New +" and select "Web Service"
+   - Connect your GitHub repository
+   - Choose a name for your service
+   - Select "Python" as the runtime
+   - Set the build command: `pip install -r requirements.txt`
+   - Set the start command: `gunicorn app:app`
+   - Add the following environment variables:
+     - `FLASK_APP=app.py`
+     - `FLASK_ENV=production`
+     - `SECRET_KEY=your-secret-key-here`
+     - `DATABASE_URL=sqlite:///expenses.db`
 
-- **Backend**: Flask (Python framework), SQLAlchemy (ORM for database)
-- **Frontend**: HTML5, CSS3 (with Bootstrap 5), JavaScript (with Chart.js)
-- **Database**: SQLite
-- **Other**: Jinja2 (templating engine), Font Awesome (icons)
+3. Click "Create Web Service"
 
-## Installation
+### Local Development
 
-1. Make sure you have Python 3.6 or higher installed.
-2. Install the required dependencies:
+1. Clone the repository
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-
-## Usage
-
-1. Run the Flask application:
+4. Create a `.env` file based on `.env.example`
+5. Run the application:
    ```bash
-   python app.py
+   flask run
    ```
-2. Open your web browser and navigate to `http://localhost:5000`.
-3. Register a new account or log in if you already have one.
-4. Start tracking your expenses and explore your financial data on the dashboard.
 
-## Database
+## Technologies Used
 
-The application uses a SQLite database (`expenses.db`) to store user and expense data. This file is automatically created when the application is run for the first time.
+- Flask
+- SQLAlchemy
+- Bootstrap 5
+- Chart.js
+- SQLite
+- Flask-Login
+- Flask-WTF
 
-## Predefined Categories
+run locally:
 
-- Food
-- Transport
-- Entertainment
-- Shopping
-- Bills
-- Healthcare
-- Education
-- Travel
-- Housing
-- Personal Care
-- Gifts
-- Other
+$env:FLASK_APP = "app.py"
+$env:FLASK_ENV = "development"
+flask run
+## License
 
-## Export Format
-
-When exporting expenses to CSV, the following information is included:
-- Date and time
-- Amount
-- Category
-- Description
-
-The exported file is named with the current timestamp for easy identification. 
+MIT License 
